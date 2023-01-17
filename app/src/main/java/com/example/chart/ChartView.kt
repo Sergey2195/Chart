@@ -3,9 +3,9 @@ package com.example.chart
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
-import android.util.Log
 import android.util.TypedValue
 import android.view.View
+import kotlin.properties.Delegates
 
 class ChartView(
     context: Context,
@@ -17,16 +17,23 @@ class ChartView(
         context,
         attrSet,
         defStyleAttr,
-        0
+        R.style.DefaultChartStyle
     )
 
-    constructor(context: Context, attrSet: AttributeSet?) : this(context, attrSet, 0)
+    constructor(context: Context, attrSet: AttributeSet?) : this(
+        context,
+        attrSet,
+        R.attr.chartStyle
+    )
+
     constructor(context: Context) : this(context, null)
 
-    private var data: Array<Int> = arrayOf(0,0,0,0,0,0)
+    private var data: Array<Int> = arrayOf(0, 0, 0, 0, 0, 0)
     private lateinit var gridPaint: Paint
     private lateinit var chartPaint: Paint
     private lateinit var arrowPain: Paint
+    private lateinit var dotsPaint: Paint
+    private lateinit var chartValuesPaint: Paint
     private val viewRect = RectF(0f, 0f, 0f, 0f)
     private var numberOfPoints = 0
     private lateinit var bottomArrow: ArrowCoordinates
@@ -40,6 +47,12 @@ class ChartView(
     private var min = 0f
     private var max = 0f
     private val dataDots: ArrayList<Dot> = arrayListOf()
+
+
+    private var chartColor by Delegates.notNull<Int>()
+    private var dotsColor by Delegates.notNull<Int>()
+    private var valuesSize by Delegates.notNull<Float>()
+    private var chartLineWidth by Delegates.notNull<Float>()
 
     init {
         if (attrSet != null) {
@@ -65,8 +78,26 @@ class ChartView(
         chartPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         chartPaint.style = Paint.Style.STROKE
         chartPaint.strokeWidth =
+            TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                chartLineWidth,
+                resources.displayMetrics
+            )
+        chartPaint.color = chartColor
+        dotsPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        dotsPaint.style = Paint.Style.STROKE
+        dotsPaint.strokeWidth = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            WIDTH_PAINT,
+            resources.displayMetrics
+        )
+        dotsPaint.color = dotsColor
+        chartValuesPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        chartValuesPaint.style = Paint.Style.FILL_AND_STROKE
+        chartValuesPaint.strokeWidth =
             TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1f, resources.displayMetrics)
-        chartPaint.color = Color.DKGRAY
+        chartValuesPaint.textSize = valuesSize
+        chartValuesPaint.color = dotsColor
     }
 
     fun setData(data: Array<Int>) {
@@ -80,7 +111,7 @@ class ChartView(
 
     private fun drawDots(canvas: Canvas) {
         for (dot in dataDots) {
-            canvas.drawCircle(dot.x, dot.y, 4f, gridPaint)
+            canvas.drawCircle(dot.x, dot.y, 4f, dotsPaint)
         }
     }
 
@@ -136,9 +167,9 @@ class ChartView(
     }
 
     private fun drawLines(canvas: Canvas) {
-        chartPaint.textSize = 30f
+        chartPaint.textSize = valuesSize
         for ((index, dot) in dataDots.withIndex()) {
-            canvas.drawText(data[index].toString(), dot.x, dot.y - 50f, chartPaint)
+            canvas.drawText(data[index].toString(), dot.x, dot.y - 50f, chartValuesPaint)
             if (index == 0) {
                 continue
             }
@@ -162,17 +193,7 @@ class ChartView(
         canvas.drawPath(topArrowPath, arrowPain)
     }
 
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        super.onSizeChanged(w, h, oldw, oldh)
-    }
-
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    }
-
     private fun updateViewSize() {
-        val safeWidth = width - paddingLeft - paddingRight
-        val safeHeight = height - paddingTop - paddingBottom
         viewRect.left = paddingLeft.toFloat() + BIAS_HORIZONTAL
         viewRect.right = (width - paddingLeft).toFloat()
         viewRect.top = paddingTop.toFloat()
@@ -198,11 +219,17 @@ class ChartView(
         defStyleAttr: Int,
         defStyleRes: Int
     ) {
-
-    }
-
-    private fun log(str: String) {
-        Log.i("TAG", str)
+        val typedArray = context.obtainStyledAttributes(
+            attrSet,
+            R.styleable.ChartView,
+            defStyleAttr,
+            defStyleRes
+        )
+        chartColor = typedArray.getColor(R.styleable.ChartView_chartColor, Color.DKGRAY)
+        dotsColor = typedArray.getColor(R.styleable.ChartView_dotsColor, Color.BLACK)
+        valuesSize = typedArray.getInt(R.styleable.ChartView_valuesSize, 50).toFloat()
+        chartLineWidth = typedArray.getInt(R.styleable.ChartView_charLineWidth, 1).toFloat()
+        typedArray.recycle()
     }
 
     companion object {

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="ChartView">
-        <attr name="color" format="color"/>
+        <attr name="chartColor" format="color"/>
+        <attr name="dotsColor" format="color"/>
+        <attr name="valuesSize" format="integer"/>
+        <attr name="charLineWidth" format="integer"/>
     </declare-styleable>
+    <attr name="chartStyle" format="reference"/>
 </resources>

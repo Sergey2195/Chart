@@ -12,5 +12,16 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="chartStyle">@style/GlobalChartStyle</item>
+    </style>
+    <style name="DefaultChartStyle">
+        <item name="chartColor">@color/black</item>
+        <item name="dotsColor">@color/black</item>
+        <item name="valuesSize">30</item>
+        <item name="charLineWidth">1</item>
+    </style>
+
+    <style name="GlobalChartStyle" parent="DefaultChartStyle">
+        <item name="valuesSize">30</item>
     </style>
 </resources>

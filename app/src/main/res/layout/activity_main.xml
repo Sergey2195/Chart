@@ -9,10 +9,15 @@
 
     <com.example.chart.ChartView
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="300dp"
         android:id="@+id/charView"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/btn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:valuesSize="30"
+        app:charLineWidth="3"
+        app:dotsColor="@color/purple_700"
+        app:chartColor="@color/purple_700"
         android:padding="10dp"/>
     <Button
         android:layout_width="match_parent"
